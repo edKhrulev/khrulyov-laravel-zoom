@@ -22,7 +22,7 @@
     "require": {
         "php": "^7.3|^8.1",
         "illuminate/support": "^8.0|^9.0|^10.0",
-        "khrulyov/laravel-api-clien": "dev-master"
+        "khrulyov/laravel-api-clien": "*"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.16|^3.14",
