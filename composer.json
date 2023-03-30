@@ -20,7 +20,7 @@
         }
     ],
     "require": {
-        "php": "^8.0|^8.1",
+        "php": "^7.3|^8.1",
         "illuminate/support": "^8.0|^9.0|^10.0",
         "khrulyov/laravel-api-client": "^4.0.2"
     },
