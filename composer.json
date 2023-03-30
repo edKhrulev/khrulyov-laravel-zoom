@@ -21,7 +21,7 @@
     ],
      "repositories": [
         {
-            "type": "path",
+            "type": "vcs",
             "url": "https://github.com/edKhrulev/laravel-api-client"
         }
     ],
