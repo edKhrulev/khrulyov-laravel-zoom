@@ -1,7 +1,7 @@
 {
     "name": "khrulyov/laravel-zoom",
     "description": "Laravel Zoom package",
-    "homepage": "https://github.com/MacsiDigital/laravel-zoom",
+    "homepage": "https://github.com/edKhrulev/khrulyov-laravel-zoom",
     "keywords": [
         "macsidigital",
         "laravel-zoom",
@@ -14,8 +14,8 @@
     "type": "library",
     "authors": [
         {
-            "name": "Colin Hall",
-            "email": "colin@macsi.co.uk",
+            "name": "Eduard Khrulyov",
+            "email": "edkhrulev@gmail.com",
             "role": "Developer"
         }
     ],
