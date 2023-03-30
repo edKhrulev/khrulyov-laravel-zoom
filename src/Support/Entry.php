@@ -21,6 +21,10 @@ class Entry extends ApiEntry
     protected $tokenLife = null;
 
     protected $baseUrl = null;
+    
+    protected $filePath = '';
+    
+    protected $guzzleClient = null;
 
     // Amount of pagination results per page by default, leave blank if should not paginate
     // Without pagination rate limits could be hit
@@ -51,13 +55,18 @@ class Entry extends ApiEntry
         $this->tokenLife = $tokenLife ? $tokenLife : config('zoom.token_life');
         $this->maxQueries = $maxQueries ? $maxQueries : (config('zoom.max_api_calls_per_request') ? config('zoom.max_api_calls_per_request') : $this->maxQueries);
         $this->baseUrl = $baseUrl ? $baseUrl : config('zoom.base_url');
+        $this->guzzleClient = new GuzzleClient();
+        $this->filePath = config('zoom.token_json');
     }
-
+    
     public function newRequest()
     {
         if (config('zoom.authentication_method') == 'jwt') {
             return $this->jwtRequest();
         } elseif (config('zoom.authentication_method') == 'oauth2') {
+            return $this->oauth2Request();
+        } else {
+            throw new \Exception('Wrong driver!');
         }
     }
 
@@ -70,5 +79,83 @@ class Entry extends ApiEntry
 
     public function oauth2Request()
     {
+        try {
+            $this->checkTokenExpiration();
+        } catch (\Exception $exception) {
+            $response = $this->generateOAuthToken();
+            $response_token = json_decode($response->getBody()->getContents(), true);
+            $this->createFile(json_encode($response_token));
+        }
+
+        return Client::baseUrl($this->baseUrl)->withToken($this->getAccessToken());
+    }
+    
+    private function generateOAuthToken(): Response
+    {
+        return $this->guzzleClient->post(config('zoom.oauth_token_url'), $this->getRequestHeader());
+    }
+    
+    private function createFile($token): void
+    {
+        $tokenPath = $this->getUserTokenFilePath();
+
+        $this->createFolder($tokenPath);
+
+        file_put_contents($tokenPath, $token);
+    }
+    
+    private function hasUserTokenFile(): bool
+    {
+        return file_exists($this->getUserTokenFilePath());
+    }
+    
+    private function createFolder($tokenPath): void
+    {
+        if (!file_exists(dirname($tokenPath))) {
+            mkdir(dirname($tokenPath), 0700, true);
+        }
+    }
+    
+    private function getUserTokenFilePath(): string
+    {
+        return storage_path($this->filePath);
+    }
+
+    private function checkTokenExpiration(): void
+    {
+        $this->guzzleClient->get($this->baseUrl . 'users', [
+            "headers" => [
+                "Authorization" => "Bearer " . $this->getAccessToken()
+            ],
+        ]);
+    }
+    
+    private function getRequestHeader(): array
+    {
+        return [
+            "headers"     => [
+                "Authorization" => "Basic " . base64_encode($this->apiKey . ':' . $this->apiSecret)
+            ],
+            'form_params' => [
+                "grant_type" => "account_credentials",
+                "account_id" => config('zoom.account_id'),
+            ],
+        ];
+    }
+    
+    private function getAccessToken(): string
+    {
+        $token = Arr::get($this->getJsonFile(), 'access_token');
+
+        if (!$token) {
+            throw new InvalidArgumentException("Invalid token format");
+        }
+
+        return $token;
+    }
+
+    private function getJsonFile(): ?array
+    {
+        return json_decode(file_get_contents($this->getUserTokenFilePath()), true);
     }
 }
