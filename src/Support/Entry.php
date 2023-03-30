@@ -5,6 +5,10 @@ namespace MacsiDigital\Zoom\Support;
 use MacsiDigital\API\Support\Authentication\JWT;
 use MacsiDigital\API\Support\Entry as ApiEntry;
 use MacsiDigital\Zoom\Facades\Client;
+use GuzzleHttp\Client as GuzzleClient;
+use InvalidArgumentException;
+use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Arr;
 
 class Entry extends ApiEntry
 {
