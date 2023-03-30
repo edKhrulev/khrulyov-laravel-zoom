@@ -19,6 +19,12 @@
             "role": "Developer"
         }
     ],
+     "repositories": [
+        {
+            "type": "path",
+            "url": "https://github.com/edKhrulev/laravel-api-client"
+        }
+    ],
     "require": {
         "php": "^7.3|^8.1",
         "illuminate/support": "^8.0|^9.0|^10.0",
